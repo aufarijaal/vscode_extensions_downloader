@@ -14,18 +14,26 @@ const readyToGenerate = computed(() => {
 });
 const parsedUrl = computed(() => {
   return parseVSCodeExtensionsUrl(inputPublisher.value, inputExtensionName.value, inputVersion.value);
-})
+});
 function reset() {
   inputPublisher.value = "";
   inputExtensionName.value = "";
   inputVersion.value = "";
 }
+function split(from: string) {
+  if(!inputExtensionName.value.includes(".") && !inputPublisher.value.includes(".")) return;
+
+  const newString = from === "publisher" ? inputPublisher.value.split(".") : inputExtensionName.value.split(".");
+
+  inputPublisher.value = newString[0].trim();
+  inputExtensionName.value = newString[1].trim();
+}
 </script>
 <template>
-  <main class="min-h-screen w-full bg-zinc-900 py-10">
-    <header class="max-w-7xl mx-auto flex flex-col gap-4 items-center">
+  <main class="min-h-screen w-full py-10">
+    <header class="max-w-7xl mx-auto flex flex-col gap-4 items-center md:px-0 px-6">
       <img class="w-20 h-20" src="/favicon.svg" alt="Logo" />
-      <h3 class="text-zinc-50 text-4xl font-bold">VSCode Extension Downloader</h3>
+      <h3 class="text-zinc-50 text-2xl sm:text-4xl font-bold">VSCode Extension Downloader</h3>
       <p class="text-sm text-zinc-400">This app will generate url that trigger downloading certain vscode extension.</p>
       <p class="text-sm text-rose-600">Please note that due to the rate limit, the action may often fail, so you may need to refresh the page link until it works.</p>
       <div class="text-sm text-zinc-400">
@@ -36,11 +44,12 @@ function reset() {
           <li>&bullet; VSCode taking long time to download the extension and you have no idea whats going on.</li>
         </ol>
       </div>
+      <p class="text-sm text-zinc-400 max-w-2xl">TIP: copy the identifier <code class="bg-zinc-800 text-xs py-0.5 px-1">publisher-name.extension-name</code> from vscode to publisher or extension name input box will automatically split them into its place</p>
       <p class="text-green-500 text-sm font-bold">USE WISELY</p>
     </header>
 
     <div class="max-w-7xl mx-auto mt-10 flex flex-col gap-4 items-center">
-      <div class="flex justify-center gap-4">
+      <div class="flex justify-center gap-4 flex-col md:flex-row">
         <div class="flex flex-col gap-2">
           <label class="text-zinc-300 font-semibold inline-flex gap-2 items-center" for="input-publisher">
             Publisher
@@ -50,11 +59,11 @@ function reset() {
               </div>
 
               <template #popper>
-                <img src="/publisher-place.png" alt="Where the publisher name placed">
+                <img src="/publisher-place.png" alt="Where the publisher name placed" />
               </template>
             </VTooltip>
           </label>
-          <input type="text" id="input-publisher" autofocus v-model="inputPublisher" placeholder="ms-python"/>
+          <input type="text" id="input-publisher" autofocus v-model="inputPublisher" placeholder="ms-python" @change="split('publisher')" />
         </div>
 
         <div class="flex flex-col gap-2">
@@ -66,11 +75,11 @@ function reset() {
               </div>
 
               <template #popper>
-                <img src="/extension-name-place.png" alt="Where the extension name placed">
+                <img src="/extension-name-place.png" alt="Where the extension name placed" />
               </template>
             </VTooltip>
           </label>
-          <input type="text" id="input-extension-name" v-model="inputExtensionName" placeholder="markdown-all-in-one"/>
+          <input type="text" id="input-extension-name" v-model="inputExtensionName" placeholder="markdown-all-in-one" @change="split('extension-name')"/>
         </div>
 
         <div class="flex flex-col gap-2">
@@ -81,13 +90,13 @@ function reset() {
                 <HelpIcon class="w-3 h-3" />
               </div>
 
-              <template #popper> 
-                <img src="/version-place.png" alt="Where the version placed">
+              <template #popper>
+                <img src="/version-place.png" alt="Where the version placed" />
                 <div class="text-sm mt-4">Without "v"</div>
               </template>
             </VTooltip>
           </label>
-          <input type="text" id="input-version" v-model="inputVersion" placeholder="2.3.2"/>
+          <input type="text" id="input-version" v-model="inputVersion" placeholder="2.3.2" />
         </div>
       </div>
 
@@ -100,6 +109,9 @@ function reset() {
         <DownloadIconAnimated v-else />
         Smash To Download
       </a>
+    </div>
+    <div class="fixed bottom-2 w-full flex justify-center">
+      <a class="text-sm text-white hover:underline" target="_blank" href="https://github.com/aufarijaal">Made by aufarijaal</a>
     </div>
   </main>
 </template>
